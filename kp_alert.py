@@ -12,12 +12,22 @@ NTFY_TOPIC = os.environ.get("NTFY_TOPIC", "")
 KP_THRESHOLD = float(os.environ.get("KP_THRESHOLD", "3.5"))
 
 
-def fetch_latest_kp() -> float:
+def fetch_latest_kp(window_minutes: int = 30) -> float:
+    """Return the max estimated_kp over the last N minutes.
+
+    Why max-over-window:
+    - Use `estimated_kp` (float, 0.33 steps) instead of `kp_index` (rounded int) for accuracy
+    - NOAA resets the estimated_kp to 0 at the start of each 3-hour Kp window
+      (00, 03, 06, 09, 12, 15, 18, 21 UTC). A single read at the boundary would
+      show Kp=0 even during an active storm. Taking the max over a 30-min window
+      rides through the reset and gives the true recent peak.
+    """
     resp = requests.get(NOAA_URL, timeout=15)
     resp.raise_for_status()
     data = resp.json()
-    # Each entry is a dict with "time_tag", "kp_index", etc.; last entry is most recent
-    return float(data[-1]["kp_index"])
+    # The feed is one entry per minute, oldest-first. Take the tail.
+    recent = data[-window_minutes:] if len(data) >= window_minutes else data
+    return max(float(entry["estimated_kp"]) for entry in recent)
 
 
 def read_state() -> dict:
