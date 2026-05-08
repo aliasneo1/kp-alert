@@ -2,7 +2,7 @@ name: Kp Alert
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "7-59/15 * * * *"
   workflow_dispatch:
 
 jobs:
