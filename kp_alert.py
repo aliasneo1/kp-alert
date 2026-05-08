@@ -15,8 +15,8 @@ def fetch_latest_kp() -> float:
     resp = requests.get(NOAA_URL, timeout=15)
     resp.raise_for_status()
     data = resp.json()
-    # Each entry is [time_tag, kp_index, ...]; last entry is most recent
-    return float(data[-1][1])
+    # Each entry is a dict with "time_tag", "kp_index", etc.; last entry is most recent
+    return float(data[-1]["kp_index"])
 
 
 def read_state() -> dict:
