@@ -1,12 +1,12 @@
 # Kp Alert
 
-Sends push notifications to your phone when the geomagnetic Kp index rises above 3.5. Built on NOAA's real-time data, GitHub Actions (free), and ntfy.sh (free, no account needed).
+Sends push notifications to your phone when the geomagnetic Kp index rises above a configurable threshold (default 3.5). Built on NOAA's real-time data, GitHub Actions (free), and ntfy.sh (free, no account needed).
 
 ## How it works
 
 - Polls [NOAA's 1-minute Kp feed](https://services.swpc.noaa.gov/json/planetary_k_index_1m.json) every 15 minutes via GitHub Actions
-- Sends a push notification on the first crossing above Kp 3.5, then escalates at each integer band (4, 5, 6, 7, 8, 9)
-- Sends an all-clear when Kp drops back below 3.5
+- Sends a push notification on the first crossing above the threshold, then escalates at each integer band (4, 5, 6, 7, 8, 9)
+- Sends an all-clear when Kp drops back below the threshold
 - One notification per transition — no spam during sustained storms
 
 ## Alert levels
@@ -32,11 +32,12 @@ Sends push notifications to your phone when the geomagnetic Kp index rises above
 
 The topic name is your only credential on the free tier — treat it like a password.
 
-### 2. GitHub — add the secret
+### 2. GitHub — add the secret and optional variable
 
 1. Fork or clone this repo
 2. Go to **Settings → Secrets and variables → Actions**
-3. Add a secret named `NTFY_TOPIC` with your topic string as the value
+3. Under the **Secrets** tab, add `NTFY_TOPIC` with your ntfy topic string as the value
+4. *(Optional)* Under the **Variables** tab, add `KP_THRESHOLD` to override the default of `3.5` — e.g. `4.0` to only alert on actual storms
 
 ### 3. Verify
 
@@ -47,9 +48,12 @@ Go to **Actions → Kp Alert → Run workflow** to trigger a manual run. Check t
 ```bash
 pip install requests
 NTFY_TOPIC=your-topic python kp_alert.py
+
+# Override the threshold
+NTFY_TOPIC=your-topic KP_THRESHOLD=4.0 python kp_alert.py
 ```
 
-To simulate a storm without waiting for real activity, set `last_alert_band` to `0` in `state.json` and temporarily lower the threshold in `kp_to_band()`.
+To simulate a storm without waiting for real activity, set `last_alert_band` to `0` in `state.json` and set `KP_THRESHOLD` to a value below the current Kp.
 
 ## Files
 
