@@ -72,11 +72,11 @@ def main() -> None:
     if current_band > last_band:
         storm = noaa_storm_level(current_band)
         if last_band == 0:
-            title = f"Geomagnetic activity rising — Kp {kp:.2f}"
+            title = f"Geomagnetic activity rising - Kp {kp:.2f}"
             msg = f"Kp index has crossed {KP_THRESHOLD}. Current level: {kp:.2f} ({storm}). Aurora possible at high latitudes."
         else:
-            title = f"Storm escalating — Kp {kp:.2f} ({storm})"
-            msg = f"Kp index rising. Now at {kp:.2f} — {storm}. Check sky conditions."
+            title = f"Storm escalating - Kp {kp:.2f} ({storm})"
+            msg = f"Kp index rising. Now at {kp:.2f} - {storm}. Check sky conditions."
 
         # Use louder tags for severe storms
         tags = "rotating_light" if current_band < 7 else "rotating_light,boom"
@@ -87,7 +87,7 @@ def main() -> None:
         write_state(state)
 
     elif current_band == 0 and last_band > 0:
-        title = "Geomagnetic storm over — All clear"
+        title = "Geomagnetic storm over - All clear"
         msg = f"Kp index has dropped back to {kp:.2f}. Storm has ended."
         send_ntfy(NTFY_TOPIC, title, msg, priority=3, tags="white_check_mark")
         state["last_alert_band"] = 0
