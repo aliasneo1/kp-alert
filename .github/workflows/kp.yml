@@ -25,6 +25,7 @@ jobs:
       - name: Run Kp alert check
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          KP_THRESHOLD: ${{ vars.KP_THRESHOLD || '3.5' }}
         run: python kp_alert.py
 
       - name: Commit updated state

@@ -9,6 +9,7 @@ import requests
 NOAA_URL = "https://services.swpc.noaa.gov/json/planetary_k_index_1m.json"
 STATE_FILE = Path(__file__).parent / "state.json"
 NTFY_TOPIC = os.environ.get("NTFY_TOPIC", "")
+KP_THRESHOLD = float(os.environ.get("KP_THRESHOLD", "3.5"))
 
 
 def fetch_latest_kp() -> float:
@@ -30,8 +31,8 @@ def write_state(state: dict) -> None:
 
 
 def kp_to_band(kp: float) -> int:
-    """0 when kp <= 3.5, else floor(kp). So 3.67->3, 4.33->4, 5.67->5, 9->9."""
-    if kp <= 3.5:
+    """0 when kp <= KP_THRESHOLD, else floor(kp)."""
+    if kp <= KP_THRESHOLD:
         return 0
     return math.floor(kp)
 
@@ -72,7 +73,7 @@ def main() -> None:
         storm = noaa_storm_level(current_band)
         if last_band == 0:
             title = f"Geomagnetic activity rising — Kp {kp:.2f}"
-            msg = f"Kp index has crossed 3.5. Current level: {kp:.2f} ({storm}). Aurora possible at high latitudes."
+            msg = f"Kp index has crossed {KP_THRESHOLD}. Current level: {kp:.2f} ({storm}). Aurora possible at high latitudes."
         else:
             title = f"Storm escalating — Kp {kp:.2f} ({storm})"
             msg = f"Kp index rising. Now at {kp:.2f} — {storm}. Check sky conditions."
