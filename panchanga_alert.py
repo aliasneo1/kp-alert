@@ -33,10 +33,15 @@ TITHI_NAMES = [
 
 
 def sunrise_jd(local_date: datetime.date, lat: float, lon: float) -> float:
-    """Julian Day (UT) of sunrise on local_date at (lat, lon)."""
+    """Julian Day (UT) of sunrise on local_date at (lat, lon).
+
+    pyswisseph 2.x signature:
+        rise_trans(tjd_ut, ipl, rsmi, geopos, atpress=0.0, attemp=0.0)
+    where geopos = (lon, lat, alt).
+    """
     jd_start = swe.julday(local_date.year, local_date.month, local_date.day, 0.0)
     flags = swe.CALC_RISE | swe.BIT_DISC_CENTER
-    res, tret = swe.rise_trans(jd_start, swe.SUN, lon, lat, 0.0, 0.0, flags)
+    res, tret = swe.rise_trans(jd_start, swe.SUN, flags, (lon, lat, 0.0))
     if res != 0:
         raise RuntimeError(f"swe.rise_trans failed (code {res})")
     return tret[0]
