@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "$j = $input | ConvertFrom-Json; $f = $j.tool_input.file_path; if ($f -and $f.EndsWith('.py') -and (Test-Path $f)) { $out = python -m py_compile $f 2>&1; if ($LASTEXITCODE -ne 0) { [Console]::Error.WriteLine($out); exit 2 } }",
+            "timeout": 15,
+            "statusMessage": "Checking Python syntax..."
+          }
+        ]
+      }
+    ]
+  }
+}
