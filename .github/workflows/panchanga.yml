@@ -1,0 +1,29 @@
+name: Panchanga Alert
+
+on:
+  schedule:
+    # 01:30 UTC = 07:00 IST. GitHub may drift; usually fires by 07:10-07:30 IST.
+    - cron: "30 1 * * *"
+  workflow_dispatch:
+
+jobs:
+  check-panchanga:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests pyswisseph
+
+      - name: Run panchanga check
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          PANCHANGA_LAT: ${{ vars.PANCHANGA_LAT || '13.0827' }}
+          PANCHANGA_LON: ${{ vars.PANCHANGA_LON || '80.2707' }}
+          PANCHANGA_TZ: ${{ vars.PANCHANGA_TZ || '5.5' }}
+        run: python panchanga_alert.py
