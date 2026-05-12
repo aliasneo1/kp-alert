@@ -16,6 +16,9 @@ NTFY_TOPIC = os.environ.get("NTFY_TOPIC", "")
 LATITUDE = float(os.environ.get("PANCHANGA_LAT", "13.0827"))   # Chennai default
 LONGITUDE = float(os.environ.get("PANCHANGA_LON", "80.2707"))
 TIMEZONE_HOURS = float(os.environ.get("PANCHANGA_TZ", "5.5"))  # IST default
+# Janma nakshatra (1-27). Default 22 = Shravana.
+# Chandrashtama = the 8th nakshatra from janma (inclusive).
+JANMA_NAKSHATRA = int(os.environ.get("JANMA_NAKSHATRA", "22"))
 
 NAKSHATRAS = [
     "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra",
@@ -95,6 +98,11 @@ def main() -> None:
     print(f"Tithi: #{tithi_num} {paksha} {tithi_name}")
     print(f"Nakshatra: #{nak_num} {nak_name}")
 
+    # Chandrashtama: 8th nakshatra (inclusive) from janma, wraps mod 27.
+    chandrashtama_nak = ((JANMA_NAKSHATRA - 1 + 7) % 27) + 1
+    janma_name = NAKSHATRAS[JANMA_NAKSHATRA - 1]
+    chandrashtama_name = NAKSHATRAS[chandrashtama_nak - 1]
+
     matches = []
     if tithi_num in (6, 21):
         matches.append(f"Sashthi ({paksha} Paksha)")
@@ -102,6 +110,10 @@ def main() -> None:
         matches.append(f"Ekadashi ({paksha} Paksha)")
     if nak_num == 8:
         matches.append("Pushya Nakshatra")
+    if nak_num == chandrashtama_nak:
+        matches.append(
+            f"Chandrashtama for {janma_name} (Moon in {chandrashtama_name})"
+        )
 
     if not matches:
         print("No match today, no alert sent.")

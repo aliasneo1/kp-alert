@@ -26,4 +26,5 @@ jobs:
           PANCHANGA_LAT: ${{ vars.PANCHANGA_LAT || '13.0827' }}
           PANCHANGA_LON: ${{ vars.PANCHANGA_LON || '80.2707' }}
           PANCHANGA_TZ: ${{ vars.PANCHANGA_TZ || '5.5' }}
+          JANMA_NAKSHATRA: ${{ vars.JANMA_NAKSHATRA || '22' }}
         run: python panchanga_alert.py
